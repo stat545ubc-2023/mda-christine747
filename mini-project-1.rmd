@@ -127,21 +127,18 @@ table(is.na(flow_sample))
 ```
 
 
-
-
 <!----------------------------------------------------------------------------->
 
 1.3 **(1 point)** Now that you've explored the 4 datasets that you were initially most interested in, let's narrow it down to 1. What lead you to choose this one? Briefly explain your choice below.
 
 <!-------------------------- Start your work below ---------------------------->
-I chose apt_buildings because of the simplicity of the categories and that the corresponding answers are easy to interpret compared to the other data sets. For instance, I'm not too sure how I would use the cancer_sample data and what some of the terms mean. I also felt the most comfortable forming questions using the apt_building data set as it is more applicable to the daily life.
+I chose apt_buildings because of the simplicity of the categories and that the corresponding answers are easy to interpret compared to the other data sets. For instance, I'm not too familiar with some of the terms in the cancer_sample data. I also felt the most comfortable forming questions using the apt_building data set as it is more applicable to daily life.
 <!----------------------------------------------------------------------------->
 
 1.4 **(2 points)** Time for a  final decision! Going back to the beginning, it's important to have an *end goal* in mind. For example, if I had chosen the `titanic` dataset for my project, I might've wanted to explore the relationship between survival and other variables. Try to think of 1 research question that you would want to answer with your dataset. Note it down below.
 
 <!-------------------------- Start your work below ---------------------------->
-Do the increasing number of elevators correlate more to the number of stories or number of units? 
-
+Does the increasing number of elevators correlate more with the number of stories or the number of units? 
 <!----------------------------------------------------------------------------->
 
 # Important note
@@ -171,48 +168,66 @@ Make sure that you're using dplyr and ggplot2 rather than base R for this task. 
 2.2 **(4 points)** For each of the 4 exercises that you complete, provide a *brief explanation* of why you chose that exercise in relation to your data (in other words, why does it make sense to do that?), and sufficient comments for a reader to understand your reasoning and code.
 
 <!-------------------------- Start your work below ---------------------------->
-1. Plot the distribution of a numeric variable.
+## Plot the distribution of elevators in apartment buildings
 
 ```{r}
 elevator_distribution <- apt_buildings %>% 
-  filter(!is.na(no_of_elevators)) %>%
+  filter(!is.na(no_of_elevators)) %>% #remove NA's
   ggplot(aes(no_of_elevators)) + 
   geom_histogram(bins = 30) 
 
-# max(apt_buildings$no_of_elevators)???
-
 print(elevator_distribution)
-# I made a histogram to see how commonly elevators are used across apartment buildings
-# It seems like most apartments do not have elevators which was not what I expected
 
-
+# I made a histogram to see how commonly elevators are used across apartment buildings and to check that most values are not just 0.
+# It seems like most apartments do not have elevators.
+# There also seems to be an outlier with more than 30 elevators in the building I want to filter out that # building to check if everything else looks reasonable
+filter(apt_buildings, no_of_elevators > 30)
+# apt building ID 11116 has 32 elevators, 6 storeys, and 68 units. Maybe this building just has a weird design.
 ```
 
-2. Explore the relationship between 2 variables in a plot.
+## Relationship between the number of units and number of stories.
 
 ```{r}
 
-units_elevators <- apt_buildings %>% 
-  filter(!is.na(no_of_elevators), !is.na(no_of_units)) %>%
-  ggplot(aes(x=no_of_units, y=no_of_elevators)) + 
+units_storeys <- apt_buildings %>% 
+  filter(!is.na(no_of_storeys), !is.na(no_of_units)) %>%
+  ggplot(aes(x=no_of_units, y=no_of_storeys)) + 
   geom_point(size = 0.5)
+print(units_storeys)
+# I created a scatterplot to see if there is a relationship between the number of units and the number of storeys in a building that might also explain the number of elevators in a building. However, there seems to be an outlier.
 
-# remove outlier 
-
- 
-print(units_elevators)
-```
+# check outlier 
+filter(apt_buildings, no_of_units > 3000)
+# Building ID 13219 has 23 stories, 3 elevators and 4111 units. No weird or missing values. This building just has a large amount of units. 
 
 
-3. Filter observations in your data according to your own criteria. 
 
-```{r}
 
 ```
 
-4. 
+
+## Filter observations in your data according to your own criteria. 
 
 ```{r}
+# I'm curious to know if all buildings built after the year 1980 would all have elevators.
+apt_buildings %>%
+  filter(year_built > 1980)
+# There were 393 buildings that were built after the year 1980.
+
+apt_buildings %>%
+  filter(year_built > 1980, no_of_elevators > 0) # filter out buildings that do not have elevators
+# Out of the 393 buildings that were built after 1980, 339 buildings have elevators. Only 53 buildings do not have elevators.
+
+
+```
+
+## Create a new tibble with only relevant data.
+
+```{r}
+# I created a tibble with only the number of elevators, number of units, and number of storeys in a building. 
+
+
+
 
 ```
 
@@ -223,13 +238,10 @@ print(units_elevators)
 **(4 points)** So far, you have chosen a dataset and gotten familiar with it through exploring the data. You have also brainstormed one research question that interested you (Task 1.4).  Now it's time to pick 4 research questions that you would like to explore in Milestone 2! Write the 4 questions and any additional comments below. 
 
 <!--- *****START HERE***** --->
-1. 
-2.
-3.
-4.
-
-
-
+1. Does the increasing number of elevators correlate more with the number of stories or the number of units?
+2. Is it more likely for buildings to have emergency power if there are more than 100 units?
+3. Are the wards equally distirbuted?
+4. How many buildings are fully equipped with an exterior fire escape, fire alarms, and a sprinkler system?
 
 <!----------------------------->
 
