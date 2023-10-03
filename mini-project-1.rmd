@@ -102,6 +102,7 @@ steam_games
 class(steam_games)
 glimpse(steam_games)
 table(is.na(steam_games))
+
 ```
 
 cancer_sample
@@ -170,7 +171,7 @@ Make sure that you're using dplyr and ggplot2 rather than base R for this task. 
 <!-------------------------- Start your work below ---------------------------->
 ## Plot the distribution of elevators in apartment buildings
 
-```{r}
+```{r elevator distribution}
 elevator_distribution <- apt_buildings %>% 
   filter(!is.na(no_of_elevators)) %>% #remove NA's
   ggplot(aes(no_of_elevators)) + 
@@ -178,16 +179,15 @@ elevator_distribution <- apt_buildings %>%
 
 print(elevator_distribution)
 
-# I made a histogram to see how commonly elevators are used across apartment buildings and to check that most values are not just 0.
-# It seems like most apartments do not have elevators.
-# There also seems to be an outlier with more than 30 elevators in the building I want to filter out that # building to check if everything else looks reasonable
+# I made a histogram to see how commonly elevators are used across apartment buildings and to check that most values are not just 0. It seems like most apartments do not have elevators.
+# There is also an outlier with more than 30 elevators in the building I want to check this building to see if everything else in that entry looks reasonable
 filter(apt_buildings, no_of_elevators > 30)
-# apt building ID 11116 has 32 elevators, 6 storeys, and 68 units. Maybe this building just has a weird design.
+# apt building ID 11116 has 32 elevators, 6 storeys, and 68 units. 
 ```
 
 ## Relationship between the number of units and number of stories.
 
-```{r}
+```{r units vs storeys}
 
 units_storeys <- apt_buildings %>% 
   filter(!is.na(no_of_storeys), !is.na(no_of_units)) %>%
@@ -208,7 +208,7 @@ filter(apt_buildings, no_of_units > 3000)
 
 ## Filter observations in your data according to your own criteria. 
 
-```{r}
+```{r built after 1980}
 # I'm curious to know if all buildings built after the year 1980 would all have elevators.
 apt_buildings %>%
   filter(year_built > 1980)
@@ -223,9 +223,11 @@ apt_buildings %>%
 
 ## Create a new tibble with only relevant data.
 
-```{r}
+```{r new tibble}
 # I created a tibble with only the number of elevators, number of units, and number of storeys in a building. 
 
+elevator_units_storey <- apt_buildings %>%
+  select(no_of_elevators, no_of_storeys, no_of_units) 
 
 
 
@@ -240,7 +242,7 @@ apt_buildings %>%
 <!--- *****START HERE***** --->
 1. Does the increasing number of elevators correlate more with the number of stories or the number of units?
 2. Is it more likely for buildings to have emergency power if there are more than 100 units?
-3. Are the wards equally distirbuted?
+3. Are the wards equally distributed?
 4. How many buildings are fully equipped with an exterior fire escape, fire alarms, and a sprinkler system?
 
 <!----------------------------->
