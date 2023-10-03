@@ -194,15 +194,31 @@ units_storeys <- apt_buildings %>%
   ggplot(aes(x=no_of_units, y=no_of_storeys)) + 
   geom_point(size = 0.5)
 print(units_storeys)
-# I created a scatterplot to see if there is a relationship between the number of units and the number of storeys in a building that might also explain the number of elevators in a building. However, there seems to be an outlier.
+# I created a scatterplot to see if there is a relationship between the number of units and the number of storeys in a building that might also explain the number of elevators in a building. However, there seems to be an outlier. Otherwise, there is a general increasing trend where the number of units also increases with the number storeys.
 
 # check outlier 
 filter(apt_buildings, no_of_units > 3000)
 # Building ID 13219 has 23 stories, 3 elevators and 4111 units. No weird or missing values. This building just has a large amount of units. 
 
+```
+```{r elevator vs units}
+elevator_units <- apt_buildings %>% 
+  filter(!is.na(no_of_elevators), !is.na(no_of_units)) %>%
+  ggplot(aes(x=no_of_units, y=no_of_elevators)) + 
+  geom_point(size = 0.5)
+print(elevator_units)
 
+# With increasing units, there is a slight increase in the number of elevators.
+```
 
+```{r elevator vs storey}
+elevator_storeys <- apt_buildings %>% 
+  filter(!is.na(no_of_elevators), !is.na(no_of_storeys)) %>%
+  ggplot(aes(x=no_of_storeys, y=no_of_elevators)) + 
+  geom_point(size = 0.5)
+print(elevator_storeys)
 
+# With increasing storeys, there doesn't seem to be an increase in the number of elevators. The majority of buildings have around the same amount of elevators. 
 ```
 
 
@@ -224,11 +240,11 @@ apt_buildings %>%
 ## Create a new tibble with only relevant data.
 
 ```{r new tibble}
-# I created a tibble with only the number of elevators, number of units, and number of storeys in a building. 
+# I created a tibble with only the number of elevators, number of units, and number of storeys in a building.
 
 elevator_units_storey <- apt_buildings %>%
-  select(no_of_elevators, no_of_storeys, no_of_units) 
-
+  select(no_of_elevators, no_of_storeys, no_of_units) %>%
+  filter(no_of_elevators > 0)
 
 
 ```
