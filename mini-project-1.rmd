@@ -99,31 +99,31 @@ And that is exactly the first thing that you will do!
 steam_games
 
 ```{r}
-class(steam_games)
-glimpse(steam_games)
-table(is.na(steam_games))
+class(steam_games) # determine the structure of the data. steam_games is a data.frame coerced into a tibble
+glimpse(steam_games) # get a glimpse of what is in the data frame, what columns it has, and the values of the first couple of rows. steam_games has 40,833 rows and 21 columns.
+table(is.na(steam_games)) # this tells me how many missing values (NA's) there are in the entire data frame, TRUE = NA, steam_games has 180899 NA's
 
 ```
 
 cancer_sample
 ```{r}
-class(cancer_sample)
-glimpse(cancer_sample)
-table(is.na(cancer_sample))
+class(cancer_sample) # determine the structure of the data. cancer_sample is a data.frame coerced into a tibble
+glimpse(cancer_sample) # get a glimpse of what is in the data frame, what columns it has, and the values of the first couple of rows. cancer_sample has 569 rows and 32 columns.
+table(is.na(cancer_sample)) # cancer_sample has no NA's, no missing values
 
 ```
 apt_buidlings
 ```{r}
-class(apt_buildings)
-glimpse(apt_buildings)
-table(is.na(apt_buildings))
+class(apt_buildings) # determine the structure of the data. apt_buildings is a data.frame coerced into a tibble
+glimpse(apt_buildings) # get a glimpse of what is in the data frame, what columns it has, and the values of the first couple of rows. apt_buildings has 3455 rows and 37 columns.
+table(is.na(apt_buildings)) # apt_buildings has 6286 NA's
 
 ```
 flow_sample
 ```{r}
-class(flow_sample)
-glimpse(flow_sample)
-table(is.na(flow_sample))
+class(flow_sample) # determine the structure of the data. flow_sample is a data.frame coerced into a tibble
+glimpse(flow_sample) # get a glimpse of what is in the data frame, what columns it has, and the values of the first couple of rows. apt_buildings has 218 rows and 7 columns.
+table(is.na(flow_sample)) # flow_sample has 125 NA's
 
 ```
 
@@ -185,7 +185,7 @@ filter(apt_buildings, no_of_elevators > 30)
 # apt building ID 11116 has 32 elevators, 6 storeys, and 68 units. 
 ```
 
-## Relationship between the number of units and number of stories.
+## Relationship between the number of units and number of storeys.
 
 ```{r units vs storeys}
 
@@ -218,7 +218,8 @@ elevator_storeys <- apt_buildings %>%
   geom_point(size = 0.5)
 print(elevator_storeys)
 
-# With increasing storeys, there doesn't seem to be an increase in the number of elevators. The majority of buildings have around the same amount of elevators. 
+# With increasing number of storeys, there doesn't seem to be an increase in the number of elevators. The majority of buildings have around the same amount of elevators. 
+
 ```
 
 
@@ -240,9 +241,9 @@ apt_buildings %>%
 ## Create a new tibble with only relevant data.
 
 ```{r new tibble}
-# I created a tibble with only the number of elevators, number of units, and number of storeys in a building.
+# I created a tibble with only the number of elevators, number of units, and number of storeys in a building. Each building should have at least one elevator
 
-elevator_units_storey <- apt_buildings %>%
+unitstorey_w_elevator <- apt_buildings %>%
   select(no_of_elevators, no_of_storeys, no_of_units) %>%
   filter(no_of_elevators > 0)
 
