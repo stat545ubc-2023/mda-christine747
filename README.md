@@ -1,4 +1,5 @@
 # STAT545A Mini Data Analysis
+*by Christine Chen*
 
 ## Summary 📑
 This repository contains the files for the mini data analysis project in STAT545A at UBC. It is split into 2 parts. Some of the learning goals of this project include familiarizing the skills needed to manipulate and summarize data, generate a reproducible and clear report using R Markdown, and be able to form and answer research questions. 
@@ -12,5 +13,8 @@ Here are the files that you will find in this repository:
 
 **mini-project-1.rmd**: This markdown file contains an initial exploratory analysis for part 1 of this mini-project.
 
+**mini-project-1.md**: This file is the knitted output for the first project milestone with contents identical to mini-project-1.rmd.
+
+**mini-project-1_files**: This folder contains the graphs generated in mini-project-1.rmd. 
 
 *If you would like to use the code in this folder/GitHub repository, you can either clone the repo or download it and run the .rmd file.*
