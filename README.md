@@ -17,4 +17,6 @@ Here are the files that you will find in this repository:
 
 **mini-project-1_files**: This folder contains the graphs generated in mini-project-1.rmd. 
 
+**.gitignore**: This text file tells git not to track certain files and folders that I don't want uploaded to my master repository. Needed if you want to configure a new repo.
+
 *If you would like to use the code in this folder/GitHub repository, you can either clone the repo or download it and run the .rmd file.*
