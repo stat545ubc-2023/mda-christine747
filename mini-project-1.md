@@ -479,7 +479,7 @@ filter(apt_buildings, no_of_elevators > 30)
 # apt building ID 11116 has 32 elevators, 6 storeys, and 68 units. 
 ```
 
-## Relationship between the number of units and number of storeys.
+## Relationship between the number of units and the number of storeys
 
 ``` r
 units_storeys <- apt_buildings %>% 
@@ -512,13 +512,28 @@ filter(apt_buildings, no_of_units > 3000)
 
 ``` r
 # Building ID 13219 has 23 stories, 3 elevators and 4111 units. No weird or missing values. This building just has a large amount of units. 
+
+# change scale to see individual points better// lessen effects from outlier
+
+units_storeys_scaled <- apt_buildings %>% 
+  filter(!is.na(no_of_storeys), !is.na(no_of_units)) %>%
+  ggplot(aes(x=no_of_units, y=no_of_storeys)) + 
+  geom_point(size = 0.5) +
+  scale_x_log10("Number of Units") +
+  xlab("Number of Storeys")
+print(units_storeys_scaled)
 ```
+
+    ## Warning: Transformation introduced infinite values in continuous x-axis
+
+![](mini-project-1_files/figure-gfm/units%20vs%20storeys-2.png)<!-- -->
 
 ``` r
 elevator_units <- apt_buildings %>% 
   filter(!is.na(no_of_elevators), !is.na(no_of_units)) %>%
   ggplot(aes(x=no_of_units, y=no_of_elevators)) + 
-  geom_point(size = 0.5)
+  geom_point(size = 0.5) +
+  scale_x_log10("Number of Units")
 print(elevator_units)
 ```
 
@@ -532,7 +547,8 @@ print(elevator_units)
 elevator_storeys <- apt_buildings %>% 
   filter(!is.na(no_of_elevators), !is.na(no_of_storeys)) %>%
   ggplot(aes(x=no_of_storeys, y=no_of_elevators)) + 
-  geom_point(size = 0.5)
+  geom_point(size = 0.5) +
+  scale_x_log10("Number of Storeys")
 print(elevator_storeys)
 ```
 
@@ -542,7 +558,7 @@ print(elevator_storeys)
 # With increasing number of storeys, there doesn't seem to be an increase in the number of elevators. The majority of buildings have around the same amount of elevators. 
 ```
 
-## Filter observations in your data according to your own criteria.
+## Filter observations in apt_buildings data
 
 ``` r
 # I'm curious to know if all buildings built after the year 1980 would all have elevators.
@@ -603,7 +619,7 @@ apt_buildings %>%
 # Out of the 393 buildings that were built after 1980, 339 buildings have elevators. Only 53 buildings do not have elevators.
 ```
 
-## Create a new tibble with only relevant data.
+## Create a new tibble with only relevant data
 
 ``` r
 # I created a tibble with only the number of elevators, number of units, and number of storeys in a building. Each building should have at least one elevator
