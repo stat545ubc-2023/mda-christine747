@@ -1,6 +1,6 @@
 ---
 title: "Mini Data Analysis Milestone 2"
-output: html_document
+output: github_document
 ---
 
 *To complete this milestone, you can either edit [this `.rmd` file](https://raw.githubusercontent.com/UBC-STAT/stat545.stat.ubc.ca/master/content/mini-project/mini-project-2.Rmd) directly. Fill in the sections that are commented out with `<!--- start your work here--->`. When you are done, make sure to knit to an `.md` file by changing the output in the YAML header to `github_document`, before submitting a tagged release on canvas.*
@@ -56,10 +56,10 @@ From milestone 1, you should have an idea of the basic structure of your dataset
 First, write out the 4 research questions you defined in milestone 1 were. This will guide your work through milestone 2:
 
 <!-------------------------- Start your work below ---------------------------->
-1. *FILL_THIS_IN*
-2. *FILL_THIS_IN*
-3. *FILL_THIS_IN*
-4. *FILL_THIS_IN*
+1. Do the number of storeys in apartment buildings correlate with the number of units?
+2. Is it more likely for buildings to have emergency power if there are more than 100 units?
+3. Are the units in each ward equally distributed?
+4. How many buildings are fully equipped with an exterior fire escape, fire alarms, and a sprinkler system? 
 <!----------------------------------------------------------------------------->
 
 Here, we will investigate your data using various data manipulation and graphing functions.
@@ -92,6 +92,128 @@ Using variables and/or tables you made in one of the "Summarizing" tasks:
 Make sure it's clear what research question you are doing each operation for!
 
 <!------------------------- Start your work below ----------------------------->
+## 1. Do the number of storeys in apartment buildings correlate with the number of units?
+```{r Q1}
+data <- apt_buildings # for data visualization
+# Summarizing Option 3: Create a categorical variable with 3 or more groups from an existing numerical variable. 
+# Create categorical variables for unit building size based on the number of units in each building ranging from small (less than or equal to 50 units), medium (between 50 to 100 units inclusive), large (between 100 to 300 units inclusive), to very large (greater than or equal to 300 units). 
+unit_category <- apt_buildings %>% 
+   mutate(unit_size = factor(case_when(no_of_units <= 50 ~ "small",
+                                 no_of_units <= 100 ~ "medium",
+                                 no_of_units <= 300 ~ "large",
+                                 TRUE ~ "very large"),
+          levels = c('small', 'medium', 'large', 'very large')))
+print(unit_category)
+# This task helps better organize buildings by their size to get a broad overview of the distribution of building unit sizes. However, using this new data frame may be overgeneralizing when comparing it to the number of storeys since we are looking at the variables separately instead of looking at the association between the number of units and storeys for each building. What might be better is to compute the correlation between the number of units and number of storeys directly. For this task, I wanted to practice creating new categorical variables from the original data set
+
+# Graphing Option 8
+# Create a boxplot between the categorical variables for different unit sizes against the number of stories.
+size_storey <- unit_category %>% 
+  ggplot(aes(x = unit_size, y = no_of_storeys)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1)
+  
+print(size_storey)
+# This task of creating a boxplot helps visualize the distribution of the number of storeys based on the size of building units. From the graph, we can see a trend that buildings with increasing unit sizes have increased number of storeys as well. However, the violin plot might not be as helpful since the number of storeys is a discrete variable which caused the spikes seen in the small unit size group. 
+
+```
+
+## 2. Is it more likely for buildings to have emergency power if there are more than 100 units?
+```{r Q2}
+# Summarizing option 4
+# Create a tibble that details the number of buildings with more than 100 units and buildings that have less than 100 units. Then group them by if they have emergency power or not and calculate the proportion of buildings with more than 100 units that have emergency power as well as the proportion of buildings with less than 100 units that have emergency power. 
+
+new_aptbuilding <- apt_buildings %>%
+  mutate(more_than100 = case_when(no_of_units > 100 ~ "YES", .default = "NO")) %>%
+  group_by(more_than100, emergency_power) %>%
+  summarize(count = n()) %>%
+  drop_na() %>%
+  group_by(more_than100) %>%
+  mutate(sum = sum(count)) %>%
+  mutate(proportion = count/sum)
+print(new_aptbuilding)
+
+# This task helped summarize two types of observations (buildings with more or less than 100 units) and (whether or not building has emergency power or not). It also helped determine the proportion for each group. We see that a higher proportion of buildings with more than 100 units have emergency power compared to buildings with less than 100 units with emergency power. This makes sense because more people living in one building would lead to more chaos if they had a power outage. 
+
+# Graphing option 8: Create a graph that has at least two geom layers. 
+# Create a bar graph that shows the proportion of buildings with more than 100 units or less than 100 units, and whether or not those buildings have emergency power. 
+
+emerg_100 <- new_aptbuilding %>% 
+  ggplot(aes(x = more_than100, y = proportion, fill = emergency_power)) +
+  geom_col() +
+  geom_text(aes(label = proportion), size = 3, position = position_stack(vjust = 0.5)) +
+  xlab("Buildings With More Than 100 Units")
+print(emerg_100)
+
+# This task was very helpful in visualizing the proportion of buildings equipped with and without emergency power based on the building having more than 100 units or less than 100 units. The labels and stacked colored bar graph also makes the interpretation very simple. 
+
+```
+
+
+## 3. Are the units in each ward equally distributed?
+```{r Q3}
+# Summarizing option 1: Compute the *range*, *mean*, and *two other summary statistics* of **one numerical variable** across the groups of **one categorical variable** from your data.
+# Compute the range, mean, median, and standard deviation of number of units 
+ward_stat <- apt_buildings %>%
+  group_by(ward) %>%
+  summarise(mean = mean(no_of_units),
+            range = max(no_of_units) - min(no_of_units),
+            median = median(no_of_units),
+            sd = sd(no_of_units, na.rm = TRUE)
+            )
+print(ward_stat)
+# This task calculates the summary statistics for the mean, range, median, and standard deviation for the number of units in each building grouped by their respective wards. It's helpful to see the mean and standard deviation especially since the question is asking about the distribution across wards. We can see that the mean across wards are within similar ranges. 
+
+
+# Graphing option 7: Make a graph where it makes sense to customize the alpha transparency
+# Make a density plot for the number of units across 25 wards under a log scale
+
+dist_ward <- apt_buildings %>%
+  filter(!is.na(no_of_units)) %>% 
+  filter(!ward=="YY") %>% 
+  ggplot(aes(no_of_units,  
+             group = ward, fill = ward)) + 
+  scale_x_log10("Number of Units") +
+  geom_density(alpha = 0.3) +
+  geom_vline(aes(xintercept=mean(no_of_units)), # add mean line
+            color="black", linetype="dashed", size=1)
+print(dist_ward)
+
+# The task helped visualize the distribution of units across 25 wards. I did not use facetwrap because having the distribution overlay together helps make the comparison across all wards easier. I also adjusted the alpha transparency to be able to see the overlap for all the wards. I added a second geom layer for the mean line but it didn't add much value to the analysis. Most ward units fall outside of the mean. From this graph overall, we can see that there are two major overlaps around ~50 units and ~3-400 units.
+
+
+```
+
+## 4. How many buildings are fully equipped with an exterior fire escape, fire alarms, and a sprinkler system?
+```{r Q4}
+
+# Summarizing option 2: count observations
+# Create a new column that returns yes or no if buildings have all 3 components of being a fire safe building. To be fire safe, buildings must have an exterior fire escape, a fire alarm, and a sprinker system.
+fire_safedf <- apt_buildings %>%
+  mutate(fire_safe = case_when(exterior_fire_escape == "YES" &
+                                   fire_alarm == "YES" &
+                                   sprinkler_system == "YES" ~ "YES",
+                                  .default = "NO")) %>%
+  group_by(fire_safe) %>%
+  summarize(count = n()) %>%
+  drop_na() 
+print(fire_safedf)
+# This task was helpful in counting how many buildings have all 3 components that make a building fire safe as well as buildings that don't have all 3 or have any missing components, which directly answers the question. 
+
+# Graphing option 8
+# Create a bar graph that shows the total number of buildings that are fire safe and ones that are not fire safe. If a building does not have all 3 components, it is not considered fire safe.
+
+fire_safe_g <- fire_safedf %>% 
+  ggplot(aes(x = fire_safe, y = count)) +
+  geom_bar(stat = "identity", fill="lightblue") +
+  geom_text(aes(label = count, y = 4000), size = 4, position = position_stack(vjust = 0.2)) +
+  xlab("Fire Safe Buildings (Includes a fire escape, fire alarm, and a sprinkler system)")
+
+print(fire_safe_g)
+
+# This task was helpful in visualizing the amount of buildings that are fire safe and ones that are not, including the exact count for both groups. 
+
+```
 
 <!----------------------------------------------------------------------------->
 
@@ -100,7 +222,7 @@ Make sure it's clear what research question you are doing each operation for!
 Based on the operations that you've completed, how much closer are you to answering your research questions? Think about what aspects of your research questions remain unclear. Can your research questions be refined, now that you've investigated your data a bit more? Which research questions are yielding interesting results?
 
 <!------------------------- Write your answer here ---------------------------->
-
+With all the summarizing and graphing tasks combined, I was able to get a better idea and visual for the answers to my research questions. I think questions 2, 3, and 4 were made much clearer with the graphs especially. Question 1 remains a bit unclear given the results from the summarizing and graphing task. Instead of grouping buildings into categories based on their size then comparing the number of storeys, it would be more efficient to plot individual data points for each building unit and its associated storey height. 
 
 <!----------------------------------------------------------------------------->
 
@@ -120,6 +242,20 @@ Based on the definition above, can you identify if your data is tidy or untidy? 
 
 <!--------------------------- Start your work below --------------------------->
 
+```{r}
+glimpse(apt_buildings) # glimpse of entire data set
+
+subset_apt <- apt_buildings %>% select(id, no_of_storeys, no_of_units, emergency_power, exterior_fire_escape, sprinkler_system, fire_alarm, balconies) # select 8 variables creating a subset of data from apt_buildings
+glimpse(subset_apt) # check subset of variables 
+
+length_check = length(subset_apt$id) == length(unique(subset_apt$id)) 
+print(length_check) # shows that each row corresponds to a unique observation based on the ID number
+
+```
+
+Based on my 4 reserach questions, the dataset is tidy. The variables I used were no_of_storeys, no_of_units, emergency_power, exterior_fire_escape, sprinker_system, fire_alarm. To reach 8 variables as the question suggests, I included id and balconies. The data remains tidy with all 8 variables.From the subset of data, each row is an observation, each column is a distinct variable, and each cell contains a unique value. Therefore, the apt_building data I have selected is tidy. It may have some NA values but that does not mean the data is untidy.
+
+
 <!----------------------------------------------------------------------------->
 
 ### 2.2 (4 points)
@@ -132,6 +268,46 @@ Be sure to explain your reasoning for this task. Show us the "before" and "after
 
 <!--------------------------- Start your work below --------------------------->
 
+
+Since my data is tidy, I will untidy it using the pivot function.
+
+#### Before: Each column is a variable and each row is an observation
+```{r}
+head(subset_apt)
+```
+
+#### Unitdy the data
+```{r}
+widen_apt <- subset_apt %>% 
+  pivot_wider(
+              names_from = emergency_power, 
+              values_from = no_of_storeys)
+head(widen_apt)
+
+# By using pivot wider, now the values for the number of storeys for each building are listed under the values for emergency_power (NO, YES, NA)
+# The last 3 columns are no longer unique variables, making this dataset untidy.
+
+
+```
+
+After: Re-tidy the data
+
+```{r}
+
+tidy_apt <- widen_apt %>%
+  pivot_longer(
+    cols = c("YES", "NO", "NA"),
+    names_to = "emergency_power",
+    values_to = "no_of_storeys") %>%
+  select(c(no_of_storeys, emergency_power), !c(no_of_storeys, emergency_power))%>%
+  filter(!is.na(emergency_power), !is.na(no_of_storeys)) # remove NA's
+glimpse(tidy_apt) 
+
+
+```
+
+The data is now tidy because I have converted back the columns such that each column is a unique variable, each row is an observation, and each cell is a value. 
+
 <!----------------------------------------------------------------------------->
 
 ### 2.3 (4 points)
@@ -140,14 +316,19 @@ Now, you should be more familiar with your data, and also have made progress in 
 
 <!-------------------------- Start your work below ---------------------------->
 
-1.  *FILL_THIS_IN*
-2.  *FILL_THIS_IN*
+1.  Do the number of storeys in apartment buildings correlate with the number of units?
+2.  How many buildings are fully equipped with an exterior fire escape, fire alarms, and a sprinkler system?
 
 <!----------------------------------------------------------------------------->
 
 Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
+
+1. Through the summarizing and graphing tasks in part 1, I saw that there is a slight increase when comparing grouped unit sizes to the number of storeys. However, I would like to see the relationship directly instead of through grouping using statistical values such as calculating for the correlation.  
+
+2. From the summarizing and graphing tasks, it seems like not a lot of buildings have all 3 fire safe components. It would be interesting to see how many buildings have at least one fire safe component, instead of having all 3.
+
 
 <!----------------------------------------------------------------------------->
 
@@ -157,6 +338,37 @@ Now, try to choose a version of your data that you think will be appropriate to 
 
 <!--------------------------- Start your work below --------------------------->
 
+filter out columns needed
+```{r}
+dataset_final <- apt_buildings %>%
+  select(no_of_storeys, no_of_units, emergency_power, exterior_fire_escape, sprinkler_system, fire_alarm) %>%
+  filter(!is.na(no_of_storeys), 
+         !is.na(no_of_units), 
+         !is.na(emergency_power), 
+         !is.na(exterior_fire_escape), 
+         !is.na(sprinkler_system), 
+         !is.na(fire_alarm)) %>% 
+  mutate(fire_safe_one = case_when(exterior_fire_escape == "YES" ~ "YES", 
+                                   fire_alarm == "YES" ~ "YES",
+                                   sprinkler_system == "YES" ~ "YES",
+                                  .default = "NO")) %>% # create a new column if building has at least one fire safe component 
+  mutate(fire_safe_count = case_when(exterior_fire_escape == "YES" & fire_alarm == "YES" & sprinkler_system == "YES" ~ "3",
+                                     exterior_fire_escape == "YES" & fire_alarm == "YES" & sprinkler_system == "NO" ~ "2",
+                                     exterior_fire_escape == "YES" & fire_alarm == "NO" & sprinkler_system == "NO" ~ "1", 
+                                     exterior_fire_escape == "NO" & fire_alarm == "NO" & sprinkler_system == "NO" ~ "0", 
+                                     exterior_fire_escape == "NO" & fire_alarm == "YES" & sprinkler_system == "NO" ~ "1", 
+                                     exterior_fire_escape == "NO" & fire_alarm == "YES" & sprinkler_system == "YES" ~ "2",
+                                     exterior_fire_escape == "YES" & fire_alarm == "NO" & sprinkler_system == "YES" ~ "2",
+                                     exterior_fire_escape == "NO" & fire_alarm == "NO" & sprinkler_system == "YES" ~ "1",
+                                     exterior_fire_escape == "NO" & fire_alarm == "YES" & sprinkler_system == "NO" ~ "1")) # create a column that counts how many fire safe components each building has from 1 to 3
+  
+  
+
+
+```
+
+
+<!----------------------------------------------------------------------------->
 # Task 3: Modelling
 
 ## 3.0 (no points)
@@ -165,9 +377,9 @@ Pick a research question from 1.2, and pick a variable of interest (we'll call i
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: FILL_THIS_IN
+**Research Question**: Do the number of units in each building correlate with the number of storeys in each building?
 
-**Variable of interest**: FILL_THIS_IN
+**Variable of interest**: Number of units
 
 <!----------------------------------------------------------------------------->
 
@@ -182,6 +394,15 @@ Fit a model or run a hypothesis test that provides insight on this variable with
     -   You could use `lm()` to test for significance of regression coefficients.
 
 <!-------------------------- Start your work below ---------------------------->
+test for correlation between number of units and number of storeys using regression analysis to obtain p value and r-squared value
+
+```{r}
+
+model <- lm(no_of_units ~ no_of_storeys, data=apt_buildings)
+summary(model)
+
+```
+
 
 <!----------------------------------------------------------------------------->
 
@@ -194,6 +415,14 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 -   Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible.
 
 <!-------------------------- Start your work below ---------------------------->
+
+I chose to produce the regression coefficient (r squared value) to know how much of the variation of the number of storeys can be explained by the number of units in the regression model.
+
+```{r}
+broom::glance(model) 
+print(broom::glance(model)) 
+
+```
 
 <!----------------------------------------------------------------------------->
 
@@ -210,6 +439,19 @@ Take a summary table that you made from Task 1, and write it as a csv file in yo
 
 <!-------------------------- Start your work below ---------------------------->
 
+
+```{r}
+#install.packages("here") 
+library(here)
+
+
+write.csv(new_aptbuilding, file = here::here("output","new_aptbuilding.csv"), row.names=FALSE)
+
+```
+
+
+
+
 <!----------------------------------------------------------------------------->
 
 ## 4.2 (3 points)
@@ -219,6 +461,9 @@ Write your model object from Task 3 to an R binary file (an RDS), and load it ag
 -   The same robustness and reproducibility criteria as in 4.1 apply here.
 
 <!-------------------------- Start your work below ---------------------------->
+
+
+
 
 <!----------------------------------------------------------------------------->
 
