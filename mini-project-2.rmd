@@ -420,7 +420,7 @@ I chose to produce the regression coefficient (r squared value) to know how much
 
 ```{r}
 broom::glance(model) 
-print(broom::glance(model)) 
+pull(broom::glance(model), "r.squared") # prints r squared value
 
 ```
 
@@ -443,13 +443,8 @@ Take a summary table that you made from Task 1, and write it as a csv file in yo
 ```{r}
 #install.packages("here") 
 library(here)
-
-
-write.csv(new_aptbuilding, file = here::here("output","new_aptbuilding.csv"), row.names=FALSE)
-
+write_csv(new_aptbuilding, here("output/new_aptbuilding.csv"))
 ```
-
-
 
 
 <!----------------------------------------------------------------------------->
@@ -462,8 +457,13 @@ Write your model object from Task 3 to an R binary file (an RDS), and load it ag
 
 <!-------------------------- Start your work below ---------------------------->
 
+```{r}
 
+saveRDS(model, file = here("output/model.RDS")) # save model into an RDS file into the output folder
+model_RDS <- readRDS(here("output/model.RDS")) 
+model_RDS
 
+```
 
 <!----------------------------------------------------------------------------->
 
