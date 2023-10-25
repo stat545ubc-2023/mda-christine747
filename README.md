@@ -2,7 +2,7 @@
 *by Christine Chen*
 
 ## Summary 📑
-This repository contains the files for the mini data analysis project in STAT545A at UBC. It is split into 2 parts. Some of the learning goals of this project include familiarizing the skills needed to manipulate and summarize data, generate a reproducible and clear report using R Markdown, and be able to form and answer research questions. 
+This repository contains the files for the mini data analysis project in STAT545A at UBC. It is split into 2 parts (Milestone 1 and Milestone 2). Some of the learning goals of this project include familiarizing the skills needed to manipulate and summarize data, generate a reproducible and clear report using R Markdown, and be able to form and answer research questions. Both Milestones utilize the apt_building dataset. Milestone 1 focuses on exploring the dataset and Milestone 2 focuses on the cleaning and analysis of the dataset.
 
 ## GitHub Repository Files 📂
 Here are the files that you will find in this repository: 
@@ -15,7 +15,7 @@ output | This folder contains the output from Milestone 2 (task 4)
 
 Within theses folders, the files contain as detailed below: 
 
-**README.md**: This markdown file contains details and overview about the project including what files are in the repository and what information each file contains.
+**README.md**: This markdown file contains details and overview about the project including what files are in the repository and what information each file contains. Each folder also contains its own README file.
 
 **mini-project-1.rmd**: This markdown file contains an initial exploratory analysis for part 1 of this mini-project.
 
